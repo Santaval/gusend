@@ -11,7 +11,6 @@ export async function GET(request: NextRequest) {
     }
 
     const tokens = await clerk.users.getUserOauthAccessToken(authData.userId, "oauth_github");
-    console.log('OAuth tokens:', tokens);
     // Get the token from the request headers
 
 
@@ -37,6 +36,8 @@ export async function GET(request: NextRequest) {
       type: type as "all" | "owner" | "public" | "private" | "member",
     });
 
+    console.log(repos);
+
     // Transform the data to include only relevant fields
     const transformedRepos = repos.map((repo) => ({
       id: repo.id,
@@ -56,6 +57,7 @@ export async function GET(request: NextRequest) {
       updated_at: repo.updated_at,
       pushed_at: repo.pushed_at,
       default_branch: repo.default_branch,
+      owner: repo.owner
     }));
 
     return NextResponse.json({ repos: transformedRepos });

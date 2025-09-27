@@ -3,25 +3,7 @@
 import GithubReposService from "@/services/Repos.service";
 import { useState, useEffect, useCallback } from "react";
 
-interface GitHubRepo {
-  id: number;
-  name: string;
-  full_name: string;
-  description: string | null;
-  html_url: string;
-  clone_url: string;
-  ssh_url: string;
-  private: boolean;
-  fork: boolean;
-  language: string | null;
-  stargazers_count: number;
-  forks_count: number;
-  open_issues_count: number;
-  created_at: string;
-  updated_at: string;
-  pushed_at: string | null;
-  default_branch: string;
-}
+
 
 interface UseGitHubReturn {
   repos: GitHubRepo[];

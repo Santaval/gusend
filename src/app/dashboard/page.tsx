@@ -33,7 +33,7 @@ export default function Page() {
               
               {/* Connected Repositories - Takes 2 columns */}
               <div className="lg:col-span-2">
-                <ConnectedRepos />
+            <ProjectsOverview />
               </div>
               
               {/* Recent Activity - Takes 1 column */}
@@ -43,7 +43,7 @@ export default function Page() {
             </div>
 
             {/* Projects Overview */}
-            <ProjectsOverview />
+            <ConnectedRepos />
             
           </div>
         </div>
