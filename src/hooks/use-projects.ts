@@ -1,0 +1,102 @@
+'use client';
+
+import { useState, useEffect, useCallback } from 'react';
+import { Project, CreateProjectRequest } from '@/types/Project';
+
+interface UseProjectsReturn {
+  projects: Project[];
+  loading: boolean;
+  error: string | null;
+  createProject: (projectData: CreateProjectRequest, githubToken?: string) => Promise<Project | null>;
+  fetchProjects: () => Promise<void>;
+}
+
+export function useProjects(): UseProjectsReturn {
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchProjects = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch('/api/projects', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to fetch projects');
+      }
+
+      const data = await response.json();
+      setProjects(data.projects || []);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const createProject = useCallback(async (
+    projectData: CreateProjectRequest, 
+    githubToken?: string
+  ): Promise<Project | null> => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+
+      // Include GitHub token for fetching repo details
+      if (githubToken) {
+        headers['Authorization'] = `Bearer ${githubToken}`;
+      }
+
+      const response = await fetch('/api/projects', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(projectData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create project');
+      }
+
+      const data = await response.json();
+      const newProject = data.project;
+
+      // Add the new project to the local state
+      setProjects(prev => [newProject, ...prev]);
+
+      return newProject;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
+      setError(errorMessage);
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Auto-fetch projects on mount
+  useEffect(() => {
+    fetchProjects();
+  }, [fetchProjects]);
+
+  return {
+    projects,
+    loading,
+    error,
+    createProject,
+    fetchProjects,
+  };
+}

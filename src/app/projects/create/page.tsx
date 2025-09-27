@@ -2,24 +2,29 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ArrowLeft, X, GitBranch, Mail, Clock } from "lucide-react"
+import { ArrowLeft, X, GitBranch, Mail, Clock, Star, Loader2 } from "lucide-react"
 import { useGitHub } from "@/hooks/use-github"
+import { useProjects } from "@/hooks/use-projects"
+import { toast } from "sonner"
 
 export default function CreateProjectPage() {
-  const [selectedRepo, setSelectedRepo] = useState(null as number | null)
-  const [automationType, setAutomationType] = useState("daily-summary")
+  const router = useRouter()
+  const { repos } = useGitHub()
+  const { createProject, loading: creatingProject } = useProjects()
+  
+  const [selectedRepo, setSelectedRepo] = useState("")
+  const [automationType, setAutomationType] = useState("")
   const [frequency, setFrequency] = useState("")
   const [recipients, setRecipients] = useState<string[]>([])
   const [recipientInput, setRecipientInput] = useState("")
   const [customSchedule, setCustomSchedule] = useState("")
-
-  const { repos } = useGitHub()
 
   const automationTypes = [
     {
@@ -55,19 +60,34 @@ export default function CreateProjectPage() {
     setRecipients(recipients.filter(r => r !== email))
   }
 
-  const handleSubmit = () => {
-    // TODO: Create project logic
-    console.log({
-      repo: selectedRepo,
-      automationType,
-      frequency,
-      recipients,
-      customSchedule
-    })
-    // Navigate to dashboard or success page
+  const handleSubmit = async () => {
+    if (!selectedRepo || !automationType || !frequency || recipients.length === 0) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
+    try {
+      const projectData = {
+        repoId: selectedRepo,
+        automationType,
+        frequency,
+        customSchedule: frequency === 'custom' ? customSchedule : undefined,
+        recipients
+      };
+
+      const project = await createProject(projectData);
+      
+      if (project) {
+        toast.success("Project created successfully!");
+        router.push("/dashboard");
+      }
+    } catch (error) {
+      console.error("Error creating project:", error);
+      toast.error("Failed to create project. Please try again.");
+    }
   }
 
-  const selectedRepoData = repos.find(r => r.id === selectedRepo)
+  const selectedRepoData = repos.find(r => r.id.toString() === selectedRepo)
   const selectedAutomationType = automationTypes.find(t => t.value === automationType)
   const selectedFrequency = frequencyOptions.find(f => f.value === frequency)
 
@@ -108,11 +128,11 @@ export default function CreateProjectPage() {
                     <div
                       key={repo.id}
                       className={`border rounded-lg p-4 cursor-pointer transition-colors ${
-                        selectedRepo === repo.id 
+                        selectedRepo === repo.id.toString() 
                           ? 'border-primary bg-primary/5' 
                           : 'border-border hover:border-primary/50'
                       }`}
-                      onClick={() => setSelectedRepo(repo.id)}
+                      onClick={() => setSelectedRepo(repo.id.toString())}
                     >
                       <div className="flex items-center space-x-3">
                         <Avatar className="h-10 w-10">
@@ -336,10 +356,17 @@ export default function CreateProjectPage() {
                   <div className="pt-4 space-y-2">
                     <Button 
                       onClick={handleSubmit}
-                      disabled={!selectedRepo || !automationType || !frequency || recipients.length === 0}
+                      disabled={!selectedRepo || !automationType || !frequency || recipients.length === 0 || creatingProject}
                       className="w-full"
                     >
-                      Create Project
+                      {creatingProject ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Creating Project...
+                        </>
+                      ) : (
+                        'Create Project'
+                      )}
                     </Button>
                     <Button variant="outline" asChild className="w-full">
                       <Link href="/dashboard">Cancel</Link>
