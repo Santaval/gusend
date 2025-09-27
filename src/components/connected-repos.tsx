@@ -2,9 +2,8 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Settings, Mail, Plus, ExternalLink } from "lucide-react";
+import { Settings, Plus, ExternalLink } from "lucide-react";
 import { useGitHub } from "@/hooks/use-github";
 import Link from "next/link";
 

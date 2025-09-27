@@ -2,13 +2,13 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Project, CreateProjectRequest } from '@/types/Project';
+import axios from 'axios';
 
 interface UseProjectsReturn {
   projects: Project[];
   loading: boolean;
   error: string | null;
   createProject: (projectData: CreateProjectRequest, githubToken?: string) => Promise<Project | null>;
-  fetchProjects: () => Promise<void>;
 }
 
 export function useProjects(): UseProjectsReturn {
@@ -16,33 +16,25 @@ export function useProjects(): UseProjectsReturn {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchProjects = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const response = await fetch('/api/projects', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to fetch projects');
+    async function loadProjects() {
+      setLoading(true);
+      setError(null);
+      try {
+        const { data } = await axios.get('/api/projects');
+        console.log("Fetched projects:", data.projects);
+        setProjects(data.projects || []);
+      } catch {
+        setError("Failed to load projects");
+      } finally {
+        setLoading(false);
       }
-
-      const data = await response.json();
-      setProjects(data.projects || []);
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
     }
-  }, []);
 
+    // use effect to load projects on mount
+    useEffect(() => {
+      loadProjects();
+    }, []);
+  
   const createProject = useCallback(async (
     projectData: CreateProjectRequest, 
     githubToken?: string
@@ -87,16 +79,12 @@ export function useProjects(): UseProjectsReturn {
     }
   }, []);
 
-  // Auto-fetch projects on mount
-  useEffect(() => {
-    fetchProjects();
-  }, [fetchProjects]);
+
 
   return {
     projects,
     loading,
     error,
     createProject,
-    fetchProjects,
   };
 }
