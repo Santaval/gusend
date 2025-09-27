@@ -17,7 +17,7 @@ import { toast } from "sonner"
 export default function CreateProjectPage() {
   const router = useRouter()
   const { repos } = useGitHub()
-  const { createProject, loading: creatingProject } = useProjects()
+  const { createProject, creating: creatingProject } = useProjects()
   
   const [selectedRepo, setSelectedRepo] = useState("")
   const [automationType, setAutomationType] = useState("")

@@ -7,6 +7,7 @@ import axios from 'axios';
 interface UseProjectsReturn {
   projects: Project[];
   loading: boolean;
+  creating?: boolean;
   error: string | null;
   createProject: (projectData: CreateProjectRequest, githubToken?: string) => Promise<Project | null>;
 }
@@ -14,6 +15,7 @@ interface UseProjectsReturn {
 export function useProjects(): UseProjectsReturn {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(false);
+  const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
     async function loadProjects() {
@@ -21,7 +23,6 @@ export function useProjects(): UseProjectsReturn {
       setError(null);
       try {
         const { data } = await axios.get('/api/projects');
-        console.log("Fetched projects:", data.projects);
         setProjects(data.projects || []);
       } catch {
         setError("Failed to load projects");
@@ -39,7 +40,7 @@ export function useProjects(): UseProjectsReturn {
     projectData: CreateProjectRequest, 
     githubToken?: string
   ): Promise<Project | null> => {
-    setLoading(true);
+    setCreating(true);
     setError(null);
 
     try {
@@ -75,7 +76,7 @@ export function useProjects(): UseProjectsReturn {
       setError(errorMessage);
       return null;
     } finally {
-      setLoading(false);
+      setCreating(false);
     }
   }, []);
 
@@ -86,5 +87,6 @@ export function useProjects(): UseProjectsReturn {
     loading,
     error,
     createProject,
+    creating
   };
 }

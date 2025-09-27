@@ -127,7 +127,7 @@ export function ProjectsOverview() {
               projects.map((project) => (
                 <TableRow key={project.id}>
                   <TableCell className="font-medium">
-                    {project.repo.owner}/{project.repo.name}
+                    {project.repo.owner.login}/{project.repo.name}
                   </TableCell>
                   <TableCell>{project.automation.type}</TableCell>
                   <TableCell>{project.automation.recipients.length}</TableCell>

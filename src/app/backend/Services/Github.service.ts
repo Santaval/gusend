@@ -17,4 +17,18 @@ export default class GithubService {
       throw new Error("Failed to fetch repositories");
     }
   }
+
+  static async findRepo(userToken: string, repoId: string) : Promise<GitHubRepo> {
+    try {
+      const repos = await this.allRepos(userToken);
+      const response = repos.find(repo => repo.id.toString() === repoId);
+      if (!response) {
+        throw new Error("Repository not found");
+      }
+      return response as GitHubRepo;
+    } catch (error) {
+      console.error("Error fetching repository:", error);
+      throw new Error("Failed to fetch repository");
+    }
+  }
 }
