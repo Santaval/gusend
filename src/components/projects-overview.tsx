@@ -9,14 +9,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { MoreHorizontal, Play, Pause, Settings } from "lucide-react"
+import { MoreHorizontal, Play, Pause, Settings, Plus } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { CreateProjectDialog } from "@/components/create-project-dialog"
+import Link from "next/link"
 
 export function ProjectsOverview() {
   const projects = [
@@ -91,7 +91,12 @@ export function ProjectsOverview() {
             Detailed view of all your email automations
           </p>
         </div>
-        <CreateProjectDialog />
+        <Button asChild>
+          <Link href="/projects/create">
+            <Plus className="h-4 w-4 mr-2" />
+            Create Project
+          </Link>
+        </Button>
       </CardHeader>
       <CardContent>
         <Table>

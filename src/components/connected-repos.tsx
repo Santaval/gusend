@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Settings, Mail, Plus, ExternalLink } from "lucide-react";
 import { useGitHub } from "@/hooks/use-github";
+import Link from "next/link";
 
 export function ConnectedRepos() {
   const { repos } = useGitHub();
@@ -19,9 +20,11 @@ export function ConnectedRepos() {
             Manage your automated email reports
           </p>
         </div>
-        <Button>
-          <Plus className="h-4 w-4 mr-2" />
-          Connect Repo
+        <Button asChild>
+          <Link href="/projects/create">
+            <Plus className="h-4 w-4 mr-2" />
+            Connect Repo
+          </Link>
         </Button>
       </CardHeader>
       <CardContent>
