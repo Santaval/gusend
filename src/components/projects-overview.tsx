@@ -16,6 +16,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { CreateProjectDialog } from "@/components/create-project-dialog"
 
 export function ProjectsOverview() {
   const projects = [
@@ -83,11 +84,14 @@ export function ProjectsOverview() {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>All Automations</CardTitle>
-        <p className="text-sm text-muted-foreground">
-          Detailed view of all your email automations
-        </p>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <div>
+          <CardTitle>All Automations</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Detailed view of all your email automations
+          </p>
+        </div>
+        <CreateProjectDialog />
       </CardHeader>
       <CardContent>
         <Table>
