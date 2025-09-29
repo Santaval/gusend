@@ -9,6 +9,7 @@ interface UseProjectsReturn {
   loading: boolean;
   creating?: boolean;
   error: string | null;
+  deleteProject: (projectId: string) => Promise<boolean>;
   createProject: (projectData: CreateProjectRequest, githubToken?: string) => Promise<Project | null>;
   updateProjectStatus: (projectId: string, status: 'active' | 'paused') => Promise<boolean>;
 }
@@ -99,11 +100,25 @@ export function useProjects(): UseProjectsReturn {
     }
   }, []);
 
+  const deleteProject = useCallback(async (projectId: string): Promise<boolean> => {
+    setError(null);
+    try {
+      await axios.delete(`/api/projects/${projectId}`);
+      setProjects(prev => prev.filter(project => project.id !== projectId));
+      return true;
+    } catch {
+      setError("Failed to delete project");
+      return false;
+    }
+  }
+  , []);
+
   return {
     projects,
     loading,
     error,
     createProject,
+    deleteProject,
     creating,
     updateProjectStatus
   };

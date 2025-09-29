@@ -1,8 +1,19 @@
 "use client"
 
+import * as React from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Toaster } from "@/components/ui/sonner"
+import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog"
 import { Skeleton } from "@/components/ui/skeleton"
 import { 
   Table,
@@ -23,7 +34,8 @@ import Link from "next/link"
 import { useProjects } from "@/hooks/use-projects"
 
 export function ProjectsOverview() {
-  const { projects, loading, error, updateProjectStatus } = useProjects()
+  const { projects, loading, error, deleteProject, updateProjectStatus } = useProjects()
+  const [projectToDelete, setProjectToDelete] = React.useState<string | null>(null)
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
@@ -175,7 +187,10 @@ export function ProjectsOverview() {
                             </>
                           )}
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="text-red-600">
+                        <DropdownMenuItem
+                          className="text-red-600"
+                          onClick={() => setProjectToDelete(project.id || null)}
+                        >
                           Delete
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -187,6 +202,46 @@ export function ProjectsOverview() {
           </TableBody>
         </Table>
       </CardContent>
+
+      <Dialog open={projectToDelete !== null} onOpenChange={() => setProjectToDelete(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Project</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this project? This will remove all automation settings and cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex gap-2 justify-end">
+            <Button
+              variant="outline"
+              onClick={() => setProjectToDelete(null)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={async () => {
+                if (!projectToDelete) return;
+                
+                try {
+                  const success = await deleteProject(projectToDelete);
+                  if (success) {
+                    setProjectToDelete(null);
+                    toast.success('Project deleted successfully');
+                  } else {
+                    toast.error('Failed to delete project');
+                  }
+                } catch {
+                  toast.error('Failed to delete project');
+                }
+              }}
+            >
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Toaster />
     </Card>
   )
 }
