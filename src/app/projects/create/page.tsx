@@ -365,7 +365,7 @@ export default function CreateProjectPage() {
                           Creating Project...
                         </>
                       ) : (
-                        'Create Project'
+                        'Create Automation'
                       )}
                     </Button>
                     <Button variant="outline" asChild className="w-full">

@@ -64,7 +64,7 @@ export function ProjectsOverview() {
         <Button asChild>
           <Link href="/projects/create">
             <Plus className="h-4 w-4 mr-2" />
-            Create Project
+            Create Automation
           </Link>
         </Button>
       </CardHeader>
