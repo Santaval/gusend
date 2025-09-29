@@ -23,7 +23,7 @@ import Link from "next/link"
 import { useProjects } from "@/hooks/use-projects"
 
 export function ProjectsOverview() {
-  const { projects, loading, error } = useProjects()
+  const { projects, loading, error, updateProjectStatus } = useProjects()
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
@@ -158,7 +158,11 @@ export function ProjectsOverview() {
                           <Settings className="mr-2 h-4 w-4" />
                           Configure
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => {
+                          if (!project.id) return;
+                          const newStatus = project.automation.status === 'active' ? 'paused' : 'active';
+                          updateProjectStatus(project.id, newStatus);
+                        }}>
                           {project.automation.status === 'active' ? (
                             <>
                               <Pause className="mr-2 h-4 w-4" />

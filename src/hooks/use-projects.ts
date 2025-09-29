@@ -10,6 +10,7 @@ interface UseProjectsReturn {
   creating?: boolean;
   error: string | null;
   createProject: (projectData: CreateProjectRequest, githubToken?: string) => Promise<Project | null>;
+  updateProjectStatus: (projectId: string, status: 'active' | 'paused') => Promise<boolean>;
 }
 
 export function useProjects(): UseProjectsReturn {
@@ -82,11 +83,28 @@ export function useProjects(): UseProjectsReturn {
 
 
 
+  const updateProjectStatus = useCallback(async (projectId: string, status: 'active' | 'paused'): Promise<boolean> => {
+    setError(null);
+    try {
+      await axios.patch(`/api/projects/${projectId}`, { status });
+      setProjects(prev => prev.map(project => 
+        project.id === projectId 
+          ? { ...project, automation: { ...project.automation, status } }
+          : project
+      ) as Project[]);
+      return true;
+    } catch {
+      setError("Failed to update project status");
+      return false;
+    }
+  }, []);
+
   return {
     projects,
     loading,
     error,
     createProject,
-    creating
+    creating,
+    updateProjectStatus
   };
 }
