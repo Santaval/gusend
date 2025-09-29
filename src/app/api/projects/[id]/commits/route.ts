@@ -1,5 +1,6 @@
 import GithubService from "@/app/backend/Services/Github.service";
 import { getFirestoreDb } from "@/lib/firebase-admin";
+import { Project } from "@/types/Project";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
@@ -14,7 +15,7 @@ export async function GET(
     return NextResponse.json({ error: "Project not found" }, { status: 404 });
   }
 
-  const data = docSnap.data();
+  const data = docSnap.data() as Project;
   if (!data) {
     return NextResponse.json(
       { error: "No data found for this project" },
@@ -28,6 +29,11 @@ export async function GET(
     data.repo.name
   );
 
-  return NextResponse.json({ commits });
+  const projectData = {
+    receivers: data.automation.recipients,
+    type: data.automation.type,
+  }
+
+  return NextResponse.json({ commits, projectData });
 }
 
