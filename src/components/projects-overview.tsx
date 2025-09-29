@@ -34,7 +34,7 @@ import Link from "next/link"
 import { useProjects } from "@/hooks/use-projects"
 
 export function ProjectsOverview() {
-  const { projects, loading, error, deleteProject, updateProjectStatus } = useProjects()
+  const { projects, loading, error, deleteProject, updateProjectStatus, runProject } = useProjects()
   const [projectToDelete, setProjectToDelete] = React.useState<string | null>(null)
 
   if (error) {
@@ -137,6 +137,25 @@ export function ProjectsOverview() {
                         <DropdownMenuItem>
                           <Settings className="mr-2 h-4 w-4" />
                           Configure
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          onClick={async () => {
+                            if (!project.id) return;
+                            try {
+                              const success = await runProject(project.id);
+                              if (success) {
+                                toast.success('Automation started successfully');
+                              } else {
+                                toast.error('Failed to start automation');
+                              }
+                            } catch {
+                              toast.error('Failed to start automation');
+                            }
+                          }}
+                          disabled={project.automation.status !== 'active'}
+                        >
+                          <Play className="mr-2 h-4 w-4" />
+                          Run Now
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => {
                           if (!project.id) return;
