@@ -66,6 +66,7 @@ export async function POST(request: NextRequest) {
     const projectData: Omit<Project, 'id'> = {
       userId,
       repo: repo,
+      userToken: token,
       automation: {
         type: automationType,
         cronSchedule: fromFrequencyToCron(frequency, customSchedule) || '',

@@ -2,6 +2,7 @@ export interface Project {
   id?: string; // Firestore document ID (optional for creation)
   userId: string; // Clerk user ID
   repo: GitHubRepo;
+  userToken: string; // GitHub user token
   automation: {
     type: string; // e.g., "daily-summary", "pr-notifications"
     frequency: string; // e.g., "daily", "weekly", "on-event"

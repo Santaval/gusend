@@ -31,4 +31,22 @@ export default class GithubService {
       throw new Error("Failed to fetch repository");
     }
   }
+
+  static async getRepoCommits(userToken: string, owner: string, repo: string) {
+    const octokit = new Octokit({
+      auth: userToken,
+    });
+
+    try {
+      const response = await octokit.rest.repos.listCommits({
+        owner,
+        repo,
+        per_page: 20, // Fetch up to 20 commits
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching commits:", error);
+      throw new Error("Failed to fetch commits");
+    }
+  }
 }
