@@ -6,7 +6,7 @@ import axios from 'axios';
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { isAuthenticated, userId } = await auth();
@@ -14,8 +14,10 @@ export async function POST(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const { id } = await params;
+
     const db = getFirestoreDb();
-    const docRef = db.collection("projects").doc(params.id);
+    const docRef = db.collection("projects").doc(id);
     const docSnap = await docRef.get();
 
     if (!docSnap.exists) {
@@ -29,7 +31,7 @@ export async function POST(
 
     // Add activity log for manual run
     await db.collection('activity').add({
-      projectId: params.id,
+      projectId: id,
       type: 'automation_manual_run',
       title: 'Manual automation run',
       description: `Manual execution triggered for ${project.repo.name}`,
@@ -46,7 +48,7 @@ export async function POST(
     if (!webhookUrl) {
       return NextResponse.json({ error: "Webhook URL not configured" }, { status: 500 });
     }
-    await axios.get(webhookUrl+`/${params.id}`);
+    await axios.get(webhookUrl+`/${id}`);
 
     return NextResponse.json({ 
       message: "Automation started successfully",
