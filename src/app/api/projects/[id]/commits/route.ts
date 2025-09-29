@@ -4,12 +4,10 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-
-
   const db = getFirestoreDb();
-  const docRef = db.collection("projects").doc(params.id);
+  const docRef = db.collection("projects").doc((await params).id);
   const docSnap = await docRef.get();
 
   if (!docSnap.exists) {
@@ -29,5 +27,7 @@ export async function GET(
     data.repo.owner.login,
     data.repo.name
   );
+
   return NextResponse.json({ commits });
 }
+

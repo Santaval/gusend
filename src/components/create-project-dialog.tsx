@@ -20,10 +20,9 @@ import {
 } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Plus, X, GitBranch, Mail, Clock } from "lucide-react"
+import { Plus, X, GitBranch, Mail } from "lucide-react"
 
 export function CreateProjectDialog() {
   const [open, setOpen] = useState(false)
