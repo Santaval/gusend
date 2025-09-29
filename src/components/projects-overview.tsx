@@ -37,38 +37,6 @@ export function ProjectsOverview() {
   const { projects, loading, error, deleteProject, updateProjectStatus } = useProjects()
   const [projectToDelete, setProjectToDelete] = React.useState<string | null>(null)
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    const now = new Date()
-    const diffTime = Math.abs(now.getTime() - date.getTime())
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-    
-    if (diffDays === 1) return "Yesterday"
-    if (diffDays < 7) return `${diffDays} days ago`
-    if (diffDays < 30) return `${Math.ceil(diffDays / 7)} weeks ago`
-    return date.toLocaleDateString()
-  }
-
-  const formatNextRun = (nextRunString?: string, status?: string) => {
-    if (status === 'paused') return 'Paused'
-    if (!nextRunString) return 'On event'
-    
-    const nextRun = new Date(nextRunString)
-    const now = new Date()
-    
-    if (nextRun.toDateString() === now.toDateString()) {
-      return `Today ${nextRun.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
-    }
-    
-    const tomorrow = new Date(now)
-    tomorrow.setDate(tomorrow.getDate() + 1)
-    if (nextRun.toDateString() === tomorrow.toDateString()) {
-      return `Tomorrow ${nextRun.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
-    }
-    
-    return nextRun.toLocaleDateString()
-  }
-
   if (error) {
     return (
       <Card>
@@ -107,10 +75,10 @@ export function ProjectsOverview() {
               <TableHead>Repository</TableHead>
               <TableHead>Automation</TableHead>
               <TableHead>Recipients</TableHead>
-              <TableHead>Last Run</TableHead>
-              <TableHead>Next Run</TableHead>
+              {/* <TableHead>Last Run</TableHead> */}
+              {/* <TableHead>Next Run</TableHead> */}
               <TableHead>Status</TableHead>
-              <TableHead>Total Sent</TableHead>
+              {/* <TableHead>Total Sent</TableHead> */}
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -143,12 +111,12 @@ export function ProjectsOverview() {
                   </TableCell>
                   <TableCell>{project.automation.type}</TableCell>
                   <TableCell>{project.automation.recipients.length}</TableCell>
-                  <TableCell className="text-muted-foreground">
+                  {/* <TableCell className="text-muted-foreground">
                     {project.automation.lastRun ? formatDate(project.automation.lastRun) : 'Never'}
                   </TableCell>
                   <TableCell className="text-muted-foreground">
                     {formatNextRun(project.automation.nextRun, project.automation.status)}
-                  </TableCell>
+                  </TableCell> */}
                   <TableCell>
                     <Badge 
                       variant={project.automation.status === 'active' ? 'default' : 'secondary'}
@@ -157,7 +125,7 @@ export function ProjectsOverview() {
                       {project.automation.status}
                     </Badge>
                   </TableCell>
-                  <TableCell>{project.automation.emailsSent}</TableCell>
+                  {/* <TableCell>{project.automation.emailsSent}</TableCell> */}
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
