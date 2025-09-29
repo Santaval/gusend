@@ -4,6 +4,7 @@ import { getFirestoreDb } from '@/lib/firebase-admin';
 import { Project, CreateProjectRequest } from '@/types/Project';
 import GithubService from '@/app/backend/Services/Github.service';
 import clerk from '@clerk/clerk-sdk-node'
+import CronJobService from '@/app/backend/Services/CronJob.service';
 
 
 export async function POST(request: NextRequest) {
@@ -104,6 +105,11 @@ export async function POST(request: NextRequest) {
       time: now.toISOString(),
       status: 'success'
     });
+
+    // register cron job
+    await CronJobService.register(docRef.id, projectData.automation.cronSchedule!);
+
+
 
     return NextResponse.json({ 
       message: 'Project created successfully', 

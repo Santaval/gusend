@@ -1,3 +1,4 @@
+import CronJobService from "@/app/backend/Services/CronJob.service";
 import { getFirestoreDb } from "@/lib/firebase-admin";
 import { Project } from "@/types/Project";
 import { auth } from "@clerk/nextjs/server";
@@ -8,10 +9,12 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
 
+  const { id } = await params;
+
   const db = getFirestoreDb();
 
-  // update proejct status 
-  const docRef = db.collection("projects").doc((await params).id);
+  // update project status
+  const docRef = db.collection("projects").doc(id);
   const docSnap = await docRef.get();
 
   if (!docSnap.exists) {
@@ -30,6 +33,14 @@ export async function PATCH(
   const { status } = body;
 
   await docRef.update({ status });
+
+  if (status === 'active') {
+    // register cron job
+    await CronJobService.register(id, data.automation.cronSchedule!);
+  } else {
+    // unregister cron job
+    await CronJobService.unregister(id);
+  }
 
   return NextResponse.json({ message: "Project updated successfully" });
 }
@@ -64,6 +75,10 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     }
 
     await docRef.delete();
+
+
+    // unregister cron job
+    await CronJobService.unregister(projectId);
 
     // Log deletion activity
     await db.collection('activity').add({
